@@ -1,0 +1,6 @@
+[submodule "Data_Analysis_Python/Excercises"]
+	path = Data_Analysis_Python/Excercises
+	url = https://github.com/Sushil346/Learning_Phase.git
+[submodule "Machine_Learning"]
+	path = Machine_Learning
+	url = https://github.com/Sushil346/Learning_Phase.git
