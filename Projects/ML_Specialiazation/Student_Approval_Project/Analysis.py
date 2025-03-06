@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 
 # Define the path to the CSV file inside the 'data' folder
 path = './data/adm_data.csv'
+path_test = './data/adm_test_data.csv'
 
-if os.path.exists(path):
+if os.path.exists(path) and os.path.exists(path_test):
     print(f"CSV file Imported Successfully", '\n')
 else:
-    print(f"CSV file not found at {path}", '\n')
+    print(f"CSV file not found", '\n')
 
-data = pd.read_csv(path)
+data = pd.read_csv(path, delimiter=',', on_bad_lines='skip')
+data_test = pd.read_csv(path_test, delimiter=',', on_bad_lines='skip')
 
 print('The dimensions of the dataset are ', data.shape)
 print('Total number of duplicate values per row ', data.duplicated().sum())
@@ -28,10 +30,10 @@ data.loc[ data['Chance of Admit'].rank(method='first', ascending=False) <= 300, 
 # print(data['Chance of Admit','Admit_Status'])
 
 # Selecting 390 rows for learning and rem 10 for prediction_test
-X_train = data.iloc[:390, :-1]
-y_train = data.iloc[:390, -1]
+X_train = data.iloc[:, :-1]
+y_train = data.iloc[:, -1]
 
-X_predict_test = data.iloc[390:, :-1]
+X_predict_test = data_test.iloc[:,:]
 
 print('The shape of X_train is: ' + str(X_train.shape))
 print('The shape of y_train is: ' + str(y_train.shape))
