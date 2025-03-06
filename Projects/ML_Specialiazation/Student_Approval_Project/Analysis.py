@@ -17,9 +17,21 @@ print('The dimensions of the dataset are ', data.shape)
 print('Total number of duplicate values per row ', data.duplicated().sum())
 #print('NUll values in each column', '\n', data.isnull().sum())
 
-# Select all rows and all columns except the last one
-X_train = data.iloc[:, :-1]
-y_train = data.iloc[:, -1]
+
+print(data.columns)
+
+data['Admit_Status'] = 0  # Default all to 0 (Not Admitted)
+
+# Set top 100 as 1 (Admitted)
+data.loc[ data['Chance of Admit'].rank(method='first', ascending=False) <= 300, 'Admit_Status'] = 1
+
+# print(data['Chance of Admit','Admit_Status'])
+
+# Selecting 390 rows for learning and rem 10 for prediction_test
+X_train = data.iloc[:390, :-1]
+y_train = data.iloc[:390, -1]
+
+X_predict_test = data.iloc[390:, :-1]
 
 print('The shape of X_train is: ' + str(X_train.shape))
 print('The shape of y_train is: ' + str(y_train.shape))
@@ -27,6 +39,10 @@ print('We have m = %d training examples' % (len(y_train)))
 
 
 ######################### LOGISTIC REGRESSION ####################################################
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train) ###Scaled and saved there itself
 
 m,n = X_train.shape
 def sigmoid(z):
@@ -85,12 +101,12 @@ def gradient_descent(X, y, wi, bi, cost_fun, gradient_fun, alpha, iterator):
     return wi, bi, J_history, w_history
 
 def model_learn():
-    initial_w = 0.1 * (np.random.rand(n) - 0.5)
+    initial_w = 0.1 * (np.random.rand(n) )
     initial_b = -8
 
     # Some gradient descent settings
-    iterations = 20000
-    alpha = 0.00001
+    iterations = 100000
+    alpha = 0.0005
 
     w,b,j_history,w_history= gradient_descent(X_train ,y_train, initial_w, initial_b, compute_costf, compute_gradient, alpha, iterations)
 
@@ -115,14 +131,19 @@ p = predict(X_train, w,b)
 print('Train Accuracy: %f'%(np.mean(p == y_train) * 100))
 
 np.random.seed(1)
-tmp_X = np.random.randn(1, n) - 0.5
+tmp_X = X_predict_test
+tmp_X = scaler.transform(tmp_X)
 
 tmp_p = predict(tmp_X, w, b)
 print(f'Output of predict: shape {tmp_p.shape}, value {tmp_p}')
 
 
-plt.plot(range(len(j_history)), j_history)
+# Cost vs Iterations
+plt.plot(j_history)
 plt.xlabel('Iterations')
 plt.ylabel('Cost')
 plt.title('Cost vs. Iterations')
+
+
+plt.tight_layout()
 plt.show()
